@@ -26,7 +26,7 @@ Toolkit.run(async tools => {
     return
   }
 
-  let version = Toolkit.inputs.version
+  let version = tools.inputs.version
   
   if (!version) {
     tools.exit.failure('`what[version]` string must be specified to [<newversion> | major | minor | patch | premajor | preminor | prepatch | prerelease [--preid=<prerelease-id>] | from-git]')
