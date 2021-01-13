@@ -26,40 +26,10 @@ Toolkit.run(async tools => {
     return
   }
 
-  const majorWords = process.env['INPUT_MAJOR-WORDING'].split(',')
-  const minorWords = process.env['INPUT_MINOR-WORDING'].split(',')
-  const preReleaseWords = process.env['INPUT_RC-WORDING'].split(',')
-
-  // if patch words aren't specified, any commit message qualifies as a patch
-  const patchWords = process.env['INPUT_PATCH-WORDING'] ? process.env['INPUT_PATCH-WORDING'].split(',') : null
-
-  let version = process.env.INPUT_DEFAULT || 'patch'
-  let foundWord = null
-
-  if (messages.some(
-    message => /^([a-zA-Z]+)(\(.+\))?(\!)\:/.test(message) || majorWords.some(word => message.includes(word)))) {
-    version = 'major'
-  } else if (messages.some(message => minorWords.some(word => message.includes(word)))) {
-    version = 'minor'
-  } else if (messages.some(message => preReleaseWords.some(word => {
-    if (message.includes(word)) {
-      foundWord = word
-      return true
-    } else {
-      return false
-    }
-  }
-  ))) {
-    const preid = foundWord.split('-')[1]
-    version = `prerelease --preid=${preid}`
-  } else if (Array.isArray(patchWords) && patchWords.length) {
-    if (!messages.some(message => patchWords.some(word => message.includes(word)))) {
-      version = null
-    }
-  }
-
-  if (version === null) {
-    tools.exit.success('No version keywords found, skipping bump.')
+  let version = Toolkit.inputs.version
+  
+  if (!version) {
+    tools.exit.failure('`what[version]` string must be specified to [<newversion> | major | minor | patch | premajor | preminor | prepatch | prerelease [--preid=<prerelease-id>] | from-git]')
     return
   }
 
